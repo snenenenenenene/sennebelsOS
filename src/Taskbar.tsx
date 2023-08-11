@@ -93,7 +93,7 @@ export default function Taskbar() {
   };
 
   return (
-    <nav className="bg-light-gray relative w-full h-[5%] flex p-1 border-t-2 border-light-primary">
+    <nav className="bg-light-gray relative w-full h-[3.5rem] flex p-1 border-t-2 border-light-primary">
       <button
         onClick={() => setShowStartMenu(!showStartMenu)}
         className="font-bold text-xl px-3 border border-light-titlebar gap-x-1 flex justify-center items-center"

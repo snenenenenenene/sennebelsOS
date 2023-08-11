@@ -36,6 +36,7 @@ export default function Window({
       };
     }
   ) => {
+    setMaximized(false);
     setDragging(true);
     const rect = ref.current!.getBoundingClientRect();
     setOffset({
@@ -73,8 +74,8 @@ export default function Window({
       }`}
       style={{
         resize: "both",
-        left: `${position.x}px`,
-        top: `${position.y}px`,
+        left: maximized ? 0 : `${position.x}px`,
+        top: maximized ? 0 : `${position.y}px`,
       }}
     >
       <nav
@@ -107,7 +108,7 @@ export default function Window({
           </button>
           <button
             onClick={() => {
-              setMaximized(true);
+              setMaximized(!maximized);
             }}
             className="border border-light-primary font-bold bg-light-gray text-light-secondary h-6 w-6"
           >
