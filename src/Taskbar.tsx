@@ -41,31 +41,31 @@ const socials = [
 const startMenuEntries = [
   {
     name: "Programs",
-    icon: "/public/icons/Program Folder (16x16px & 24x24px).ico",
+    icon: "/icons/Program Folder (16x16px & 24x24px).ico",
   },
   {
     name: "Documents",
-    icon: "/public/icons/Documents Folder.ico",
+    icon: "/icons/Documents Folder.ico",
   },
   {
     name: "Settings",
-    icon: "/public/icons/Settings.ico",
+    icon: "/icons/Settings.ico",
   },
   {
     name: "Find",
-    icon: "/public/icons/Files from computer.ico",
+    icon: "/icons/Files from computer.ico",
   },
   {
     name: "Help",
-    icon: "/public/icons/Help book.ico",
+    icon: "/icons/Help book.ico",
   },
   {
     name: "Run",
-    icon: "/public/icons/Search in sheet (16x16px & 24x24px).ico",
+    icon: "/icons/Search in sheet (16x16px & 24x24px).ico",
   },
   {
     name: "Shut Down",
-    icon: "/public/icons/Turn Off Computer (full).ico",
+    icon: "/icons/Turn Off Computer (full).ico",
   },
 ];
 
@@ -98,7 +98,7 @@ export default function Taskbar() {
         onClick={() => setShowStartMenu(!showStartMenu)}
         className="font-bold text-xl px-3 border border-light-titlebar gap-x-1 flex justify-center items-center"
       >
-        <img src="/public/icons/Windows logo (without text).ico" />
+        <img src="/icons/Windows logo (without text).ico" />
         Start
       </button>
       <section className="ml-auto uppercase items-center flex gap-x-2 text-xl px-3 border border-light-titlebar">

@@ -132,7 +132,7 @@ export const DesktopEntry = ({
 export const desktopItems = [
   {
     name: "My Projects",
-    icon: "/public/icons/Folder.ico",
+    icon: "/icons/Folder.ico",
     type: "folder",
     selected: false,
 
@@ -164,7 +164,7 @@ export const desktopItems = [
   },
   {
     name: "Games",
-    icon: "/public/icons/Folder.ico",
+    icon: "/icons/Folder.ico",
     type: "folder",
     selected: false,
 
@@ -197,7 +197,7 @@ export const desktopItems = [
   },
   {
     name: "My 3D Models",
-    icon: "/public/icons/Folder.ico",
+    icon: "/icons/Folder.ico",
     type: "program",
     selected: false,
 
@@ -229,7 +229,7 @@ export const desktopItems = [
   },
   {
     name: "Recycle Bin",
-    icon: "/public/icons/Recycle Bin with document.ico",
+    icon: "/icons/Recycle Bin with document.ico",
     type: "folder",
     selected: false,
     location: {
@@ -257,7 +257,7 @@ export const desktopItems = [
   },
   {
     name: "Browser",
-    icon: "/public/icons/Earth (16 colors).ico",
+    icon: "/icons/Earth (16 colors).ico",
     type: "program",
     selected: false,
     location: {
@@ -279,7 +279,7 @@ export const desktopItems = [
   },
   {
     name: "Me.jpeg",
-    icon: "/public/me.jpeg",
+    icon: "/me.jpeg",
     type: "image",
     selected: false,
     location: {
@@ -290,7 +290,7 @@ export const desktopItems = [
   },
   {
     name: "Resume.pdf",
-    icon: "/public/icons/Book.ico",
+    icon: "/icons/Book.ico",
     type: "pdf",
     selected: false,
     location: {
@@ -299,13 +299,13 @@ export const desktopItems = [
     },
     actionChildren: (
       <div className="w-full h-full flex">
-        <iframe className="w-full" src="/public/SenneBelsCV.pdf"></iframe>
+        <iframe className="w-full" src="/SenneBelsCV.pdf"></iframe>
       </div>
     ),
   },
   {
     name: "Minecraft.exe",
-    icon: "/public/assets/games/grass.png",
+    icon: "/assets/games/grass.png",
     type: "program",
     selected: false,
     location: {
@@ -323,7 +323,7 @@ export const desktopItems = [
   },
   {
     name: "About Me.txt",
-    icon: "/public/icons/Notepad document.ico",
+    icon: "/icons/Notepad document.ico",
     type: "program",
     selected: false,
     location: {
