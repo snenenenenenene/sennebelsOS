@@ -131,7 +131,7 @@ export const webProjects = [
   {
     id: 10,
     name: "React Minecraft",
-    link: "minecraft-react-ashy.vercel.app",
+    link: "https://minecraft-react-ashy.vercel.app",
     technologies: ["react", "typescript", "three"],
     top: 24,
     left: 36,
