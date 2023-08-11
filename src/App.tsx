@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { ReactNode, useRef, useState } from "react";
 import Taskbar from "./Taskbar";
 import Window from "./Window";
@@ -28,23 +29,42 @@ export const DesktopEntry = ({
   const [showAction, setShowAction] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
-  const handleMouseDown = (e) => {
+  const handleMouseDown = (
+    event: MouseEvent & {
+      currentTarget: {
+        getBoundingClientRect: () => { left: number; top: number };
+        style: {
+          left: string;
+          top: string;
+        };
+      };
+    }
+  ) => {
     setDragging(true);
-    const rect = e.currentTarget.getBoundingClientRect();
+    const rect = event.currentTarget.getBoundingClientRect();
     setOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
     });
   };
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (
+    event: MouseEvent & {
+      currentTarget: {
+        style: {
+          left: string;
+          top: string;
+        };
+      };
+    }
+  ) => {
     if (!dragging) return;
 
-    const newX = e?.clientX - offset.x;
-    const newY = e?.clientY - offset.y;
+    const newX = event?.clientX - offset.x;
+    const newY = event?.clientY - offset.y;
 
-    e.currentTarget.style.left = newX + "px";
-    e.currentTarget.style.top = newY + "px";
+    event.currentTarget!.style.left = newX + "px";
+    event.currentTarget!.style.top = newY + "px";
   };
 
   const handleMouseUp = () => {
@@ -60,7 +80,9 @@ export const DesktopEntry = ({
           }
           setSelected(true);
         }}
+        // @ts-ignore
         onMouseDown={handleMouseDown}
+        // @ts-ignore
         onMouseMove={handleMouseMove}
         onMouseLeave={() => {
           if (!dragging) {
@@ -368,26 +390,27 @@ function App() {
         className="bg-light-desktop w-full h-[95%] flex flex-col relative"
         id="desktop"
         // if right click show context menu
-        onContextMenu={(e) => {
-          e.preventDefault();
+        onContextMenu={(event) => {
+          event.preventDefault();
           // open the context menu in the place of the mouse
-          contextRef.current!.style.left = e.clientX + "px";
-          contextRef.current!.style.top = e.clientY + "px";
+          contextRef.current!.style.left = event.clientX + "px";
+          contextRef.current!.style.top = event.clientY + "px";
 
           setShowContextMenu(true);
         }}
-        onMouseDown={(e) => {
-          if (e.target.id === "desktop") {
+        onMouseDown={(event) => {
+          // @ts-ignore
+          if (event.target.id === "desktop") {
             const selectionBox = document.getElementById(
               "selectionBox"
             ) as HTMLDivElement;
 
-            selectionBox.style.left = e.clientX + "px";
-            selectionBox.style.top = e.clientY + "px";
+            selectionBox.style.left = event.clientX + "px";
+            selectionBox.style.top = event.clientY + "px";
             selectionBox.style.width = "0px";
             selectionBox.style.height = "0px";
 
-            setMouseDownPosition({ x: e.clientX, y: e.clientY });
+            setMouseDownPosition({ x: event.clientX, y: event.clientY });
             setShowSelectionBox(true);
           }
         }}
@@ -410,7 +433,7 @@ function App() {
             selectionBox.style.top = y + "px";
           }
         }}
-        onMouseUp={(e) => {
+        onMouseUp={() => {
           setShowSelectionBox(false);
         }}
       >
