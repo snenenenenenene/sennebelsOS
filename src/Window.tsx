@@ -4,12 +4,14 @@ import React, { useRef, useState } from "react";
 export default function Window({
   name,
   icon,
+  minimised,
   type,
   actionChildren,
   setShowAction,
   setSelected,
 }: {
   name: string;
+  minimised?: boolean;
   icon: string;
   type: string;
   actionChildren?: React.ReactNode;
@@ -69,8 +71,12 @@ export default function Window({
   return (
     <div
       ref={ref}
-      className={`absolute z-30 resize shadow-xl  bg-light-gray border-light-primary border-2 flex flex-col ${
-        maximized ? "w-full h-full" : "h-5/6 aspect-square"
+      className={`absolute z-30 resize shadow-xl  bg-light-gray border-light-primary border-2 flex-col ${
+        minimised
+          ? maximized
+            ? "w-full h-full flex"
+            : "h-5/6 aspect-square flex"
+          : "hidden"
       }`}
       style={{
         resize: "both",
@@ -90,7 +96,7 @@ export default function Window({
         }}
         onMouseUp={handleMouseUp}
         draggable={false}
-        className="w-full h-10 flex px-1 items-center bg-light-titlebar text-light-text cursor-move "
+        className="select-none w-full h-10 flex px-1 items-center bg-light-titlebar text-light-text cursor-move "
       >
         <span className="flex pointer-events-none gap-x-1 mr-auto">
           <img src={icon} className="w-6 h-6" />
@@ -126,7 +132,7 @@ export default function Window({
         </section>
       </nav>
       <div className="w-full h-[90%] p-1 flex flex-col">
-        <nav className="h-8 w-full flex gap-x-2 p-1">
+        <nav className="select-none h-8 w-full flex gap-x-2 p-1">
           <button className="h-full w-8">
             <p>File</p>
           </button>

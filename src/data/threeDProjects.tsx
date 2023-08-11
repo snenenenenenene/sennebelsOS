@@ -10,7 +10,7 @@ export const threeDProjects: {
   description: string;
   images: string[];
   link?: string;
-  models?: ReactNode;
+  models?: [ReactNode];
 }[] = [
   {
     id: 1,
