@@ -22,9 +22,7 @@ export const DesktopEntry = ({
 }) => {
   const [selected, setSelected] = useState(itemSelected);
   const [dragging, setDragging] = useState(false);
-  const [showAction, setShowAction] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const windows = useWindowsStore((state: any) => state?.windows);
   const appendWindow = useWindowsStore((state: any) => state?.appendWindow);
 
   const handleMouseDown = (
@@ -74,24 +72,18 @@ export const DesktopEntry = ({
       <article
         onClick={() => {
           if (selected) {
-            setShowAction(true);
+            console.log("yaa");
             appendWindow({
               id: name,
               name,
               icon,
               type,
               actionChildren,
-              setShowAction,
-              setSelected,
               selected,
               minimised: false,
-              setMinimised: () => {},
               maximised: false,
-              setMaximised: () => {},
               location: { top: location.top, left: location.left },
-              setLocation: () => {},
               size: { width: 0, height: 0 },
-              setSize: () => {},
             });
           }
           setSelected(true);
@@ -131,16 +123,6 @@ export const DesktopEntry = ({
           {name || "No Name"}
         </p>
       </article>
-      {/* {showAction && (
-        <Window
-          type={type}
-          name={name}
-          icon={icon}
-          setShowAction={setShowAction}
-          setSelected={setSelected}
-          actionChildren={actionChildren}
-        />
-      )} */}
     </>
   );
 };

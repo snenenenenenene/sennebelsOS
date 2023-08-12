@@ -38,7 +38,6 @@ export const useWindowsStore = create()(
             return state;
           }),
         setWindows: (windows: any) => set({ windows }),
-        // append a window and give it a unique id with nanoid
         appendWindow: (window: any) =>
           set((state: any) => ({
             windows: [
@@ -52,7 +51,7 @@ export const useWindowsStore = create()(
                 },
                 minimised: false,
                 maximised: false,
-                actionChildren: window.actionChildren || null,
+                // actionChildren: window?.actionChildren || null,
               },
             ],
           })),
