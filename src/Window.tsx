@@ -151,16 +151,18 @@ export default function Window({ id }: { id: string }) {
             <p>Help</p>
           </button>
         </nav>
-        <section className="flex w-full h-full bg-white">
-          {windowData?.type === "image" ? (
-            <img
-              src={windowData?.icon}
-              className="w-full h-full flex object-cover"
-            />
-          ) : (
-            windowData?.actionChildren
-          )}
-        </section>
+        {windowData && (
+          <section className="flex w-full h-full bg-white">
+            {windowData?.type === "image" ? (
+              <img
+                src={windowData?.icon}
+                className="w-full h-full flex object-cover"
+              />
+            ) : windowData?.actionChildren ? (
+              windowData?.actionChildren
+            ) : null}
+          </section>
+        )}
       </div>
     </div>
   );

@@ -52,6 +52,7 @@ export const useWindowsStore = create()(
                 },
                 minimised: false,
                 maximised: false,
+                actionChildren: window.actionChildren || null,
               },
             ],
           })),

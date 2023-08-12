@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { FaGithub, FaGoogle, FaItchIo, FaLinkedinIn } from "react-icons/fa";
+import { socials } from "./data/socials";
+import { startMenuEntries } from "./data/startMenuEntries";
 export const StartMenuEntry = ({
   name,
   icon,
@@ -15,67 +16,12 @@ export const StartMenuEntry = ({
   );
 };
 
-const socials = [
-  {
-    name: "Github",
-    icon: <FaGithub />,
-    href: "https://github.com/snenenenenenene",
-  },
-  {
-    name: "LinkedIn",
-    icon: <FaLinkedinIn />,
-    href: "https://www.linkedin.com/in/sennebels/",
-  },
-  {
-    name: "Email",
-    icon: <FaGoogle />,
-    href: "mailto:sennebels@gmail.com",
-  },
-  {
-    name: "itch.io",
-    icon: <FaItchIo />,
-    href: "https://snenenenene.itch.io/",
-  },
-];
-
-const startMenuEntries = [
-  {
-    name: "Programs",
-    icon: "/icons/Program Folder (16x16px & 24x24px).ico",
-  },
-  {
-    name: "Documents",
-    icon: "/icons/Documents Folder.ico",
-  },
-  {
-    name: "Settings",
-    icon: "/icons/Settings.ico",
-  },
-  {
-    name: "Find",
-    icon: "/icons/Files from computer.ico",
-  },
-  {
-    name: "Help",
-    icon: "/icons/Help book.ico",
-  },
-  {
-    name: "Run",
-    icon: "/icons/Search in sheet (16x16px & 24x24px).ico",
-  },
-  {
-    name: "Shut Down",
-    icon: "/icons/Turn Off Computer (full).ico",
-  },
-];
-
 export default function Taskbar() {
   const [time, setTime] = useState(new Date());
   const [showStartMenu, setShowStartMenu] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // use imperial time and add am or pm dont add seconds (eg 12:00 pm)
       setTime(new Date());
     }, 1000);
     return () => clearInterval(interval);
@@ -86,7 +32,7 @@ export default function Taskbar() {
     let minutes: number | string = date.getMinutes();
     const ampm = hours >= 12 ? "pm" : "am";
     hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
+    hours = hours ? hours : 12;
     minutes = minutes < 10 ? "0" + minutes : minutes;
     const strTime = hours + ":" + minutes + " " + ampm;
     return strTime;
