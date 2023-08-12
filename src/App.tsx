@@ -5,14 +5,14 @@ import Window from "./Window";
 import { useWindowsStore } from "./utils/store";
 
 function App() {
-  const windows = useWindowsStore((state: any) => state.windows);
-
+  const windows = useWindowsStore((state: any) => state?.windows);
   return (
     <div className="w-screen overflow-hidden h-screen flex font-display flex-col">
       <Desktop>
-        {windows.map((window: any) => (
-          <Window key={window.id} {...window} />
-        ))}
+        {windows &&
+          windows.map((window: any) => (
+            <Window id={window.id} key={window.id} />
+          ))}
       </Desktop>
       <Taskbar />
     </div>

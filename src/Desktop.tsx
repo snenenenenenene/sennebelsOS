@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import ContextMenu from "./ContextMenu";
 import { DesktopEntry } from "./DesktopEntry";
-import Window from "./Window";
 import { desktopItems } from "./data/desktopItems";
 
 export default function Desktop({ children }: { children?: React.ReactNode }) {
@@ -23,7 +22,7 @@ export default function Desktop({ children }: { children?: React.ReactNode }) {
           item.selected = false;
         });
       }}
-      className="bg-light-desktop w-full h-[95%] flex flex-col relative"
+      className="bg-light-desktop w-full h-full flex flex-col relative"
       id="desktop"
       onContextMenu={(event) => {
         event.preventDefault();
@@ -71,9 +70,6 @@ export default function Desktop({ children }: { children?: React.ReactNode }) {
         setShowSelectionBox(false);
       }}
     >
-      {windows.map((window: any) => (
-        <Window key={window.id} {...window} />
-      ))}
       <div
         id="selectionBox"
         className={`${

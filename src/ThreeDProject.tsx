@@ -1,10 +1,9 @@
 import { useState } from "react";
-import Window from "./Window";
 import { threeDProjects } from "./data/threeDProjects";
 export default function ThreeDProject() {
   const [selectedProject, setSelectedProject] = useState(threeDProjects[0]);
-  const [selected, setSelected] = useState(false);
   const [showAction, setShowAction] = useState(false);
+
   return (
     <>
       {threeDProjects.map((project) => (
@@ -13,7 +12,6 @@ export default function ThreeDProject() {
             key={project.name}
             onClick={() => {
               setSelectedProject(project);
-              setSelected(true);
               setShowAction(true);
             }}
             className="h-40 flex-col  aspect-square hover:bg-light-blue hover:text-light-text flex justify-start p-4 py-2 gap-x-2 items-center"
@@ -29,26 +27,21 @@ export default function ThreeDProject() {
           </button>
         </>
       ))}
-      {showAction && (
+      {/* {showAction && (
         <Window
-          actionChildren={
-            selectedProject.models ? (
-              selectedProject.models[0]
-            ) : (
-              <img
-                src={selectedProject.images[0]}
-                alt={selectedProject.name}
-                className="w-full h-full flex object-cover"
-              />
-            )
-          }
-          name={selectedProject.name}
-          icon={"/public/icons/Drawing red picture.ico"}
-          type={"image"}
-          setShowAction={() => setShowAction(true)}
-          setSelected={() => setSelected(false)}
+          // actionChildren={
+          //   selectedProject.models ? (
+          //     selectedProject.models[0]
+          //   ) : (
+          //     <img
+          //       src={selectedProject.images[0]}
+          //       alt={selectedProject.name}
+          //       className="w-full h-full flex object-cover"
+          //     />
+          //   )
+          // }
         />
-      )}
+      )} */}
     </>
   );
 }

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { ReactNode, useState } from "react";
-import Window from "./Window";
+import { useWindowsStore } from "./utils/store";
 export const DesktopEntry = ({
   name,
   icon,
@@ -23,6 +24,8 @@ export const DesktopEntry = ({
   const [dragging, setDragging] = useState(false);
   const [showAction, setShowAction] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const windows = useWindowsStore((state: any) => state?.windows);
+  const appendWindow = useWindowsStore((state: any) => state?.appendWindow);
 
   const handleMouseDown = (
     event: MouseEvent & {
@@ -72,6 +75,24 @@ export const DesktopEntry = ({
         onClick={() => {
           if (selected) {
             setShowAction(true);
+            appendWindow({
+              id: name,
+              name,
+              icon,
+              type,
+              actionChildren,
+              setShowAction,
+              setSelected,
+              selected,
+              minimised: false,
+              setMinimised: () => {},
+              maximised: false,
+              setMaximised: () => {},
+              location: { top: location.top, left: location.left },
+              setLocation: () => {},
+              size: { width: 0, height: 0 },
+              setSize: () => {},
+            });
           }
           setSelected(true);
         }}
@@ -110,7 +131,7 @@ export const DesktopEntry = ({
           {name || "No Name"}
         </p>
       </article>
-      {showAction && (
+      {/* {showAction && (
         <Window
           type={type}
           name={name}
@@ -119,7 +140,7 @@ export const DesktopEntry = ({
           setSelected={setSelected}
           actionChildren={actionChildren}
         />
-      )}
+      )} */}
     </>
   );
 };

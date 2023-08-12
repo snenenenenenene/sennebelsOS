@@ -1,30 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { TWindow, useWindowsStore } from "./utils/store";
 
-export default function Window({
-  name,
-  icon,
-  minimised,
-  type,
-  actionChildren,
-  setShowAction,
-  setSelected,
-}: {
-  name: string;
-  minimised?: boolean;
-  icon: string;
-  type: string;
-  actionChildren?: React.ReactNode;
-  setShowAction: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelected: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+export default function Window({ id }: { id: string }) {
   const [dragging, setDragging] = useState(false);
-  const [maximized, setMaximized] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [position, setPosition] = useState({
-    x: window.innerWidth / 2 - 150,
-    y: window.innerHeight / 2 - 250,
-  });
+
+  const windows = useWindowsStore((state: any) => state.windows);
+  const setWindows = useWindowsStore((state: any) => state.setWindows);
+  const windowData: TWindow = windows.find((w: any) => w.id === id);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -38,7 +23,6 @@ export default function Window({
       };
     }
   ) => {
-    setMaximized(false);
     setDragging(true);
     const rect = ref.current!.getBoundingClientRect();
     setOffset({
@@ -62,7 +46,15 @@ export default function Window({
     const newX = e.clientX - offset.x;
     const newY = e.clientY - offset.y;
 
-    setPosition({ x: newX, y: newY });
+    //TODO: Replace with setWindowById
+    setWindows(
+      windows.map((w: any) => {
+        if (w.id === id) {
+          w.location = { left: newX, top: newY };
+        }
+        return w;
+      })
+    );
   };
 
   const handleMouseUp = () => {
@@ -72,16 +64,15 @@ export default function Window({
     <div
       ref={ref}
       className={`absolute z-30 resize shadow-xl  bg-light-gray border-light-primary border-2 flex-col ${
-        minimised
-          ? maximized
-            ? "w-full h-full flex"
-            : "h-5/6 aspect-square flex"
-          : "hidden"
+        windowData.minimised
+          ? "hidden"
+          : windowData.maximised
+          ? "w-full h-full flex"
+          : "h-5/6 aspect-square flex"
       }`}
       style={{
-        resize: "both",
-        left: maximized ? 0 : `${position.x}px`,
-        top: maximized ? 0 : `${position.y}px`,
+        left: windowData.maximised ? 0 : `${windowData?.location?.left}px`,
+        top: windowData.maximised ? 0 : `${windowData?.location?.top}px`,
       }}
     >
       <nav
@@ -99,14 +90,21 @@ export default function Window({
         className="select-none w-full h-10 flex px-1 items-center bg-light-titlebar text-light-text cursor-move "
       >
         <span className="flex pointer-events-none gap-x-1 mr-auto">
-          <img src={icon} className="w-6 h-6" />
-          {name}
+          <img src={windowData?.icon} className="w-6 h-6" />
+          {windowData?.name}
         </span>
         <section className="flex pr-1 gap-x-1">
           <button
             onClick={() => {
-              setShowAction(false);
-              setSelected(false);
+              setWindows(
+                windows.map((w: any) => {
+                  if (w.id === windowData.id) {
+                    w.minimised = true;
+                    w.selected = false;
+                  }
+                  return w;
+                })
+              );
             }}
             className="border border-light-primary font-bold bg-light-gray text-light-secondary h-6 w-6"
           >
@@ -114,7 +112,14 @@ export default function Window({
           </button>
           <button
             onClick={() => {
-              setMaximized(!maximized);
+              setWindows(
+                windows.map((w: any) => {
+                  if (w.id === windowData.id) {
+                    w.maximised = !w.maximised;
+                  }
+                  return w;
+                })
+              );
             }}
             className="border border-light-primary font-bold bg-light-gray text-light-secondary h-6 w-6"
           >
@@ -122,8 +127,8 @@ export default function Window({
           </button>
           <button
             onClick={() => {
-              setShowAction(false);
-              setSelected(false);
+              if (!windowData) return;
+              setWindows(windows.filter((w: any) => w.id !== windowData.id));
             }}
             className="border border-light-primary font-bold bg-light-gray text-light-secondary h-6 w-6"
           >
@@ -147,10 +152,13 @@ export default function Window({
           </button>
         </nav>
         <section className="flex w-full h-full bg-white">
-          {type === "image" ? (
-            <img src={icon} className="w-full h-full flex object-cover" />
+          {windowData?.type === "image" ? (
+            <img
+              src={windowData?.icon}
+              className="w-full h-full flex object-cover"
+            />
           ) : (
-            actionChildren
+            windowData?.actionChildren
           )}
         </section>
       </div>
