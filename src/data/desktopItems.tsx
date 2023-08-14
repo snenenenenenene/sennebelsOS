@@ -183,7 +183,10 @@ export const desktopItems = [
     },
     actionChildren: (
       <div className="w-full h-full flex">
-        <p className="h-full px-1 text-justify text-xl font-display">
+        <p
+          contentEditable={true}
+          className="h-full px-1 text-justify text-xl font-display"
+        >
           I&apos;m&nbsp;
           <b className="text-light-desktop font-bold">Senne Bels</b>, a 22-year
           old IT-graduate - and human.

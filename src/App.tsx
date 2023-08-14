@@ -4,6 +4,7 @@ import Taskbar from "./Taskbar";
 import Window from "./Window";
 import { useWindowsStore } from "./utils/store";
 
+// TODO: FIX MINIMISING AND REFRESH ERROR
 function App() {
   const windows = useWindowsStore((state: any) => state?.windows);
   return (

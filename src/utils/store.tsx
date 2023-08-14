@@ -6,7 +6,7 @@
 // import { Race } from "@/data/races/types";
 import { nanoid } from "nanoid";
 import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
+import { devtools } from "zustand/middleware";
 
 export type TWindow = {
   id: string;
@@ -23,47 +23,45 @@ export type TWindow = {
 
 export const useWindowsStore = create()(
   devtools(
-    persist(
-      (set) => ({
-        getWindow: (id: string) =>
-          set((state: any) => {
-            return state.windows.find((w: any) => w.id === id);
-          }),
-        setWindow: (window: any) =>
-          set((state: any) => {
-            const index = state.windows.findIndex(
-              (w: any) => w.id === window.id
-            );
-            state.windows[index] = window;
-            return state;
-          }),
-        setWindows: (windows: any) => set({ windows }),
-        appendWindow: (window: any) =>
-          set((state: any) => ({
-            windows: [
-              ...state.windows,
-              {
-                ...window,
-                id: nanoid(),
-                location: {
-                  left: window?.innerHeight / 2 - 250,
-                  top: window?.innerWidth / 2 - 250,
-                },
-                minimised: false,
-                maximised: false,
-                // actionChildren: window?.actionChildren || null,
+    // persist(
+    (set) => ({
+      getWindow: (id: string) =>
+        set((state: any) => {
+          return state.windows.find((w: any) => w.id === id);
+        }),
+      setWindow: (window: any) =>
+        set((state: any) => {
+          const index = state.windows.findIndex((w: any) => w.id === window.id);
+          state.windows[index] = window;
+          return state;
+        }),
+      setWindows: (windows: any) => set({ windows }),
+      appendWindow: (window: any) =>
+        set((state: any) => ({
+          windows: [
+            ...state.windows,
+            {
+              ...window,
+              id: nanoid(),
+              location: {
+                left: window?.innerHeight / 2 - 250,
+                top: window?.innerWidth / 2 - 250,
               },
-            ],
-          })),
-        removeWindow: (window: any) =>
-          set((state: any) => ({
-            windows: state.windows.filter((w: any) => w.id !== window.id),
-          })),
-        windows: [],
-      }),
-      {
-        name: "OS-storage",
-      }
-    )
+              minimised: false,
+              maximised: false,
+              // actionChildren: window?.actionChildren || null,
+            },
+          ],
+        })),
+      removeWindow: (window: any) =>
+        set((state: any) => ({
+          windows: state.windows.filter((w: any) => w.id !== window.id),
+        })),
+      windows: [],
+    })
+    // {
+    //   name: "OS-storage",
+    // }
+    // )
   )
 );
