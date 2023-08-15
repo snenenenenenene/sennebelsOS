@@ -6,3 +6,6 @@
   font-family: "W95";
   src: url("/public/W95FA.otf");
 }
+html {
+  cursor: url("/cursor.gif"), default;
+}

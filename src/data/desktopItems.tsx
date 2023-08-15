@@ -156,7 +156,7 @@ export const desktopItems = [
   },
   {
     name: "Minecraft.exe",
-    icon: "/assets/games/grass.png",
+    icon: "/public/assets/games/grass.png",
     type: "program",
     selected: false,
     location: {
@@ -218,6 +218,21 @@ export const desktopItems = [
           <b className="font-bold">Fun fact</b>: I love Okapi&apos;s and visit
           them in my local zoo whenever I can. This is what inspired my logo.
         </p>
+      </div>
+    ),
+  },
+  {
+    name: "Paint.exe",
+    icon: "/icons/Paint.ico",
+    type: "program",
+    selected: false,
+    location: {
+      top: 0,
+      left: 100,
+    },
+    actionChildren: (
+      <div className="w-full h-full flex select-none">
+        <iframe src="https://jspaint.app" width="100%" height="100%"></iframe>
       </div>
     ),
   },

@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { socials } from "./data/socials";
 import { startMenuEntries } from "./data/startMenuEntries";
+import { TWindow, useWindowsStore } from "./utils/store";
 export const StartMenuEntry = ({
   name,
   icon,
@@ -19,6 +21,8 @@ export const StartMenuEntry = ({
 export default function Taskbar() {
   const [time, setTime] = useState(new Date());
   const [showStartMenu, setShowStartMenu] = useState(false);
+  const windows = useWindowsStore((state: any) => state.windows);
+  const setWindows = useWindowsStore((state: any) => state.setWindows);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -47,6 +51,28 @@ export default function Taskbar() {
         <img src="/icons/Windows logo (without text).ico" />
         Start
       </button>
+      <section className="flex-1 flex gap-x-2 text-xl px-3 border-l-2 mx-4 border-light-titlebar">
+        {windows.map((window: TWindow) => (
+          <button
+            className={`${
+              window.minimised
+                ? "bg-[5px_3px] shadow-[inset_-1px_-1px_0px_#ffffff,inset_1px_1px_0px_#0c0c0c,inset_-2px_-2px_0px_#bbc3c4,inset_2px_2px_0px_#808088]"
+                : "bg-no-repeat bg-[4px_2px] shadow-[inset_-1px_-1px_0px_#0c0c0c,inset_1px_1px_0px_#ffffff,inset_-2px_-2px_0px_#808088,inset_2px_2px_0px_#bbc3c4]"
+            } flex items-center gap-x-1 border-2 border-light-titlebar px-4 py-1 text-left overflow-hidden whitespace-nowrap text-ellipsis `}
+            key={window.id}
+            onClick={() =>
+              setWindows([
+                ...windows.map((w: TWindow) =>
+                  w.id === window.id ? { ...w, minimised: !w.minimised } : w
+                ),
+              ])
+            }
+          >
+            <img className="h-full aspect-square" src={window.icon} />
+            <p>{window.name}</p>
+          </button>
+        ))}
+      </section>
       <section className="ml-auto uppercase items-center flex gap-x-2 text-xl px-3 border border-light-titlebar">
         {socials.map((social) => (
           <a
