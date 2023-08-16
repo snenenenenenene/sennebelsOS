@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import ContextMenu from "./ContextMenu";
 import { DesktopEntry } from "./DesktopEntry";
 import { desktopItems } from "./data/desktopItems";
+import { clickSound } from "./utils/sounds";
 
 export default function Desktop({ children }: { children?: React.ReactNode }) {
   const [showContextMenu, setShowContextMenu] = useState(false);
@@ -16,7 +17,11 @@ export default function Desktop({ children }: { children?: React.ReactNode }) {
 
   return (
     <div
-      onClick={() => {
+      onClick={(event) => {
+        // @ts-ignore
+        if (event.target.id === "desktop") {
+          clickSound.play();
+        }
         setShowContextMenu(false);
         desktopItems.forEach((item) => {
           item.selected = false;

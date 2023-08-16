@@ -58,6 +58,8 @@ export const useWindowsStore = create()(
           windows: state.windows.filter((w: any) => w.id !== window.id),
         })),
       windows: [],
+      alreadyVisited: false,
+      setAlreadyVisited: (alreadyVisited: boolean) => set({ alreadyVisited }),
     })
     // {
     //   name: "OS-storage",

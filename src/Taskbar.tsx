@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { socials } from "./data/socials";
 import { startMenuEntries } from "./data/startMenuEntries";
+import { buttonSound, clickSound } from "./utils/sounds";
 import { TWindow, useWindowsStore } from "./utils/store";
 export const StartMenuEntry = ({
   name,
@@ -45,7 +46,10 @@ export default function Taskbar() {
   return (
     <nav className="bg-light-gray relative w-full h-[3.5rem] flex p-1 border-t-2 border-light-primary">
       <button
-        onClick={() => setShowStartMenu(!showStartMenu)}
+        onClick={() => {
+          setShowStartMenu(!showStartMenu);
+          buttonSound.play();
+        }}
         className="font-bold text-xl px-3 border border-light-titlebar gap-x-1 flex justify-center items-center"
       >
         <img src="/icons/Windows logo (without text).ico" />
@@ -92,7 +96,10 @@ export default function Taskbar() {
             <button
               key={entry.name}
               className="w-full h-full hover:bg-light-blue hover:text-light-text flex justify-start p-4 py-2 gap-x-2 items-center"
-              onClick={() => setShowStartMenu(false)}
+              onClick={() => {
+                clickSound.play();
+                setShowStartMenu(false);
+              }}
             >
               <img src={entry.icon} />
               <p>{entry.name}</p>
