@@ -40,8 +40,8 @@ const DesktopEntry: React.FC<DesktopEntryProps> = ({
       selected: true,
       minimised: false,
       maximised: false,
-      location,
-      size: { width: 300, height: 200 },
+      location: { left: 100, top: 100 }, // Change this to a default location
+      size: { width: 1000, height: 600 },
       actionChildren, // Pass the specific content for this desktop entry
     });
   };

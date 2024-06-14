@@ -29,12 +29,14 @@ const Window: React.FC<WindowProps> = ({ id }) => {
     toggleMaximiseWindow,
     removeWindow,
     updateWindowSize,
+    bringWindowToFront,
   } = useWindowsStore((state) => ({
     updateWindowLocation: state.updateWindowLocation,
     toggleMinimiseWindow: state.toggleMinimiseWindow,
     toggleMaximiseWindow: state.toggleMaximiseWindow,
     removeWindow: state.removeWindow,
     updateWindowSize: state.updateWindowSize,
+    bringWindowToFront: state.bringWindowToFront,
   }));
 
   const desktopRef = document.getElementById("desktop");
@@ -82,6 +84,7 @@ const Window: React.FC<WindowProps> = ({ id }) => {
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!ref.current || isResizing) return;
 
+    bringWindowToFront(id);
     setStartPosition({
       x: e.clientX - windowData!.location.left,
       y: e.clientY - windowData!.location.top,
@@ -155,6 +158,7 @@ const Window: React.FC<WindowProps> = ({ id }) => {
         top: windowData.location.top,
         width: windowData.size.width,
         height: windowData.size.height,
+        zIndex: windowData.zIndex,
       }}
       onMouseDown={handleMouseDown}
     >

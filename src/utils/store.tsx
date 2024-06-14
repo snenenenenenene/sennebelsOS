@@ -12,6 +12,7 @@ interface Window {
   location: { left: number; top: number };
   size: { width: number; height: number };
   actionChildren: React.ReactNode;
+  zIndex: number;
 }
 
 interface Store {
@@ -35,7 +36,10 @@ interface Store {
     id: string,
     size: { width: number; height: number }
   ) => void;
+  bringWindowToFront: (id: string) => void;
 }
+
+let nextZIndex = 1;
 
 export const useWindowsStore = create<Store>(
   devtools((set) => ({
@@ -53,12 +57,24 @@ export const useWindowsStore = create<Store>(
         })),
       })),
     appendWindow: (window) =>
-      set((state) => ({
-        windows: [
-          ...state.windows,
-          { ...window, id: `${Date.now()}`, selected: true },
-        ],
-      })),
+      set((state) => {
+        const existingWindows = state.windows;
+        const newLeft = 100 + existingWindows.length * 30;
+        const newTop = 100 + existingWindows.length * 30;
+        return {
+          windows: [
+            ...existingWindows,
+            {
+              ...window,
+              id: `${Date.now()}`,
+              selected: true,
+              zIndex: nextZIndex++,
+              location: { left: newLeft, top: newTop },
+              size: { width: 1000, height: 600 },
+            },
+          ],
+        };
+      }),
     removeWindow: (id) =>
       set((state) => ({
         windows: state.windows.filter((window) => window.id !== id),
@@ -90,6 +106,13 @@ export const useWindowsStore = create<Store>(
         windows: state.windows.map((window) =>
           window.id === id ? { ...window, size } : window
         ),
+      })),
+    bringWindowToFront: (id) =>
+      set((state) => ({
+        windows: state.windows.map((window) => ({
+          ...window,
+          zIndex: window.id === id ? nextZIndex++ : window.zIndex,
+        })),
       })),
   }))
 );

@@ -178,8 +178,8 @@ export const desktopItems = [
     type: "program",
     selected: false,
     location: {
-      top: 800,
-      left: 10,
+      top: 200,
+      left: 800,
     },
     actionChildren: (
       <div className="w-full h-full flex">
@@ -188,8 +188,11 @@ export const desktopItems = [
           className="h-full px-1 text-justify text-xl font-display"
         >
           I&apos;m&nbsp;
-          <b className="text-light-desktop font-bold">Senne Bels</b>, a 22-year
-          old IT-graduate - and human.
+          <b className="text-light-desktop font-bold">Senne Bels</b>, a&nbsp;
+          {new Date().getFullYear() -
+            2000 -
+            (new Date().getMonth() < 10 ? 1 : 0)}
+          -year-old IT-graduate - and human.
           <br />
           <br />
           After having graduated in 2022, I started working as a frontend
