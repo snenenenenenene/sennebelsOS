@@ -1,169 +1,211 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import { useRef, useState } from "react";
-import { TWindow, useWindowsStore } from "./utils/store";
+import React, { useRef, useState, useEffect } from "react";
+import { useWindowsStore } from "./utils/store"; // Ensure the correct path
 
-export default function Window({ id }: { id: string }) {
-  const [dragging, setDragging] = useState(false);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+interface WindowProps {
+  id: string;
+}
 
-  const windows = useWindowsStore((state: any) => state.windows);
-  const setWindows = useWindowsStore((state: any) => state.setWindows);
-  const windowData: TWindow = windows.find((w: any) => w.id === id);
-
+const Window: React.FC<WindowProps> = ({ id }) => {
+  const [isDragging, setIsDragging] = useState(false);
+  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  const [isResizing, setIsResizing] = useState(false);
+  const [startSize, setStartSize] = useState({ width: 0, height: 0 });
+  const [prevSize, setPrevSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+  const [prevLocation, setPrevLocation] = useState<{
+    left: number;
+    top: number;
+  } | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
-  const handleMouseDown = (
-    e: MouseEvent & {
-      currentTarget: {
-        style: {
-          left: string;
-          top: string;
-        };
-      };
+  const windowData = useWindowsStore((state) =>
+    state.windows.find((w) => w.id === id)
+  );
+  const {
+    updateWindowLocation,
+    toggleMinimiseWindow,
+    toggleMaximiseWindow,
+    removeWindow,
+    updateWindowSize,
+  } = useWindowsStore((state) => ({
+    updateWindowLocation: state.updateWindowLocation,
+    toggleMinimiseWindow: state.toggleMinimiseWindow,
+    toggleMaximiseWindow: state.toggleMaximiseWindow,
+    removeWindow: state.removeWindow,
+    updateWindowSize: state.updateWindowSize,
+  }));
+
+  const desktopRef = document.getElementById("desktop");
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging) {
+        const newX = e.clientX - startPosition.x;
+        const newY = e.clientY - startPosition.y;
+        updateWindowLocation(id, { left: newX, top: newY });
+      }
+      if (isResizing) {
+        const newWidth = e.clientX - startPosition.x + startSize.width;
+        const newHeight = e.clientY - startPosition.y + startSize.height;
+        updateWindowSize(id, { width: newWidth, height: newHeight });
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      setIsResizing(false);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    if (isDragging || isResizing) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
     }
-  ) => {
-    setDragging(true);
-    const rect = ref.current!.getBoundingClientRect();
-    setOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [
+    isDragging,
+    isResizing,
+    startPosition,
+    startSize,
+    id,
+    updateWindowLocation,
+    updateWindowSize,
+  ]);
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!ref.current || isResizing) return;
+
+    setStartPosition({
+      x: e.clientX - windowData!.location.left,
+      y: e.clientY - windowData!.location.top,
     });
+    setIsDragging(true);
   };
 
-  const handleMouseMove = (
-    e: MouseEvent & {
-      currentTarget: {
-        style: {
-          left: string;
-          top: string;
-        };
-      };
-    }
+  const handleResizeMouseDown = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
-    if (!dragging) return;
+    if (!ref.current) return;
 
-    const newX = e.clientX - offset.x;
-    const newY = e.clientY - offset.y;
-
-    //TODO: Replace with setWindowById
-    setWindows(
-      windows.map((w: any) => {
-        if (w.id === id) {
-          w.location = { left: newX, top: newY };
-        }
-        return w;
-      })
-    );
+    e.stopPropagation(); // Prevent dragging when resizing
+    setStartPosition({ x: e.clientX, y: e.clientY });
+    setStartSize({
+      width: windowData!.size.width,
+      height: windowData!.size.height,
+    });
+    setIsResizing(true);
   };
 
-  const handleMouseUp = () => {
-    setDragging(false);
+  const handleMaximize = () => {
+    if (!desktopRef) return;
+    const desktopRect = desktopRef.getBoundingClientRect();
+
+    if (windowData?.maximised) {
+      // Restore to previous size and location
+      toggleMaximiseWindow(id);
+      if (prevLocation && prevSize) {
+        updateWindowLocation(id, prevLocation);
+        updateWindowSize(id, prevSize);
+        setPrevLocation(null);
+        setPrevSize(null);
+      }
+    } else {
+      // Maximize
+      setPrevLocation({
+        left: windowData.location.left,
+        top: windowData.location.top,
+      });
+      setPrevSize({
+        width: windowData.size.width,
+        height: windowData.size.height,
+      });
+      toggleMaximiseWindow(id);
+      updateWindowLocation(id, { left: 0, top: 0 });
+      updateWindowSize(id, {
+        width: desktopRect.width,
+        height: desktopRect.height,
+      });
+    }
   };
+
+  if (!windowData) {
+    console.log("No window data available.");
+    return null;
+  }
+
   return (
     <div
       ref={ref}
-      className={`absolute z-30 resize shadow-xl  bg-light-gray border-light-primary border-2 flex-col ${
+      className={`absolute z-30 shadow-xl bg-light-gray border-light-primary border-2 ${
         windowData.minimised
           ? "hidden"
           : windowData.maximised
-          ? "w-full h-full flex"
-          : "h-5/6 aspect-square flex"
+          ? "left-0 top-0 w-full h-full"
+          : "flex flex-col"
       }`}
       style={{
-        left: windowData.maximised ? 0 : `${windowData?.location?.left}px`,
-        top: windowData.maximised ? 0 : `${windowData?.location?.top}px`,
+        left: windowData.location.left,
+        top: windowData.location.top,
+        width: windowData.size.width,
+        height: windowData.size.height,
       }}
+      onMouseDown={handleMouseDown}
     >
-      <nav
-        // @ts-ignore
-        onMouseDown={handleMouseDown}
-        // @ts-ignore
-        onMouseMove={handleMouseMove}
-        onMouseLeave={() => {
-          if (dragging) {
-            setDragging(false);
-          }
-        }}
-        onMouseUp={handleMouseUp}
-        draggable={false}
-        className="select-none w-full h-10 flex px-1 items-center bg-light-titlebar text-light-text cursor-move "
-      >
+      <nav className="select-none w-full h-10 flex justify-between items-center bg-light-titlebar text-light-text cursor-move">
         <span className="flex pointer-events-none gap-x-1 mr-auto">
-          <img src={windowData?.icon} className="w-6 h-6" />
-          {windowData?.name}
+          <img
+            src={windowData.icon}
+            className="w-6 h-6"
+            alt={windowData.name}
+          />
+          {windowData.name}
         </span>
-        <section className="flex pr-1 gap-x-1">
+        <div className="flex pr-1 gap-x-1">
           <button
-            onClick={() => {
-              setWindows(
-                windows.map((w: any) => {
-                  if (w.id === windowData.id) {
-                    w.minimised = true;
-                    w.selected = false;
-                  }
-                  return w;
-                })
-              );
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleMinimiseWindow(id);
             }}
             className="border border-light-primary font-bold bg-light-gray text-light-secondary h-6 w-6"
           >
             _
           </button>
           <button
-            onClick={() => {
-              setWindows(
-                windows.map((w: any) => {
-                  if (w.id === windowData.id) {
-                    w.maximised = !w.maximised;
-                  }
-                  return w;
-                })
-              );
+            onClick={(e) => {
+              e.stopPropagation();
+              handleMaximize();
             }}
             className="border border-light-primary font-bold bg-light-gray text-light-secondary h-6 w-6"
           >
-            [&nbsp;]
+            [ ]
           </button>
           <button
-            onClick={() => {
-              if (!windowData) return;
-              setWindows(windows.filter((w: any) => w.id !== windowData.id));
+            onClick={(e) => {
+              e.stopPropagation();
+              removeWindow(id);
             }}
             className="border border-light-primary font-bold bg-light-gray text-light-secondary h-6 w-6"
           >
             X
           </button>
-        </section>
+        </div>
       </nav>
-      <div className="w-full h-[90%] p-1 flex flex-col">
-        <nav className="select-none h-8 w-full flex gap-x-2 p-1">
-          <button className="h-full w-8">
-            <p>File</p>
-          </button>
-          <button className="h-full w-8">
-            <p>Edit</p>
-          </button>
-          <button className="h-full w-8">
-            <p>View</p>
-          </button>
-          <button className="h-full w-8">
-            <p>Help</p>
-          </button>
-        </nav>
-        {windowData && (
-          <section className="flex w-full h-full bg-white">
-            {windowData?.type === "image" ? (
-              <img
-                src={windowData?.icon}
-                className="w-full h-full flex object-cover"
-              />
-            ) : windowData?.actionChildren ? (
-              windowData?.actionChildren
-            ) : null}
-          </section>
-        )}
+      <div className="window-content flex-1 overflow-auto p-1">
+        {windowData.actionChildren}
       </div>
+      <div
+        className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize bg-transparent"
+        onMouseDown={handleResizeMouseDown}
+      />
     </div>
   );
-}
+};
+
+export default Window;

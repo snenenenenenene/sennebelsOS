@@ -1,99 +1,45 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useRef, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import ContextMenu from "./ContextMenu";
-import { DesktopEntry } from "./DesktopEntry";
+import DesktopEntry from "./DesktopEntry";
 import { desktopItems } from "./data/desktopItems";
-import { clickSound } from "./utils/sounds";
+import { useWindowsStore } from "./utils/store";
 
-export default function Desktop({ children }: { children?: React.ReactNode }) {
-  const [showContextMenu, setShowContextMenu] = useState(false);
+type DesktopProps = {
+  children?: React.ReactNode;
+};
+
+const Desktop: React.FC<DesktopProps> = ({ children }) => {
+  const [showContextMenu, setShowContextMenu] = useState<boolean>(false);
   const contextRef = useRef<HTMLDivElement>(null);
-  const [mouseDownPosition, setMouseDownPosition] = useState({
-    x: 0,
-    y: 0,
-  });
-  const [showSelectionBox, setShowSelectionBox] = useState(false);
+  const deselectAll = useWindowsStore((state) => state.deselectAll);
+
+  const handleDesktopClick = useCallback(() => {
+    setShowContextMenu(false);
+    deselectAll();
+  }, [deselectAll]);
 
   return (
     <div
-      onClick={(event) => {
-        // @ts-ignore
-        if (event.target.id === "desktop") {
-          clickSound.play();
-        }
-        setShowContextMenu(false);
-        desktopItems.forEach((item) => {
-          item.selected = false;
-        });
-      }}
+      onClick={handleDesktopClick}
       className="bg-light-desktop w-full h-full flex flex-col relative"
       id="desktop"
-      onContextMenu={(event) => {
+      onContextMenu={(event: React.MouseEvent) => {
         event.preventDefault();
-        contextRef.current!.style.left = event.clientX + "px";
-        contextRef.current!.style.top = event.clientY + "px";
-
+        const { clientX, clientY } = event;
+        if (contextRef.current) {
+          contextRef.current.style.left = `${clientX}px`;
+          contextRef.current.style.top = `${clientY}px`;
+        }
         setShowContextMenu(true);
       }}
-      onMouseDown={(event) => {
-        // @ts-ignore
-        if (event.target.id === "desktop") {
-          const selectionBox = document.getElementById(
-            "selectionBox"
-          ) as HTMLDivElement;
-
-          selectionBox.style.left = event.clientX + "px";
-          selectionBox.style.top = event.clientY + "px";
-          selectionBox.style.width = "0px";
-          selectionBox.style.height = "0px";
-
-          setMouseDownPosition({ x: event.clientX, y: event.clientY });
-          setShowSelectionBox(true);
-        }
-      }}
-      onMouseMove={(e) => {
-        const selectionBox = document.getElementById(
-          "selectionBox"
-        ) as HTMLDivElement;
-        const x = e.clientX;
-        const y = e.clientY;
-        if (x > mouseDownPosition.x) {
-          selectionBox.style.width = x - mouseDownPosition.x + "px";
-        } else {
-          selectionBox.style.width = mouseDownPosition.x - x + "px";
-          selectionBox.style.left = x + "px";
-        }
-        if (y > mouseDownPosition.y) {
-          selectionBox.style.height = y - mouseDownPosition.y + "px";
-        } else {
-          selectionBox.style.height = mouseDownPosition.y - y + "px";
-          selectionBox.style.top = y + "px";
-        }
-      }}
-      onMouseUp={() => {
-        setShowSelectionBox(false);
-      }}
     >
-      <div
-        id="selectionBox"
-        className={`${
-          showSelectionBox ? "flex" : "hidden"
-        } w-0 h-0 absolute pointer-events-none border-2  border-light-primary border-dotted`}
-      />
       {desktopItems.map((entry) => (
-        <DesktopEntry
-          location={{ left: entry.location.left, top: entry.location.top }}
-          key={entry.name}
-          itemSelected={entry.selected}
-          name={entry.name}
-          type={entry.type}
-          icon={entry.icon}
-          actionChildren={entry.actionChildren}
-        />
+        <DesktopEntry key={entry.name} {...entry} />
       ))}
       {children}
-      <ContextMenu showContextMenu={showContextMenu} contextRef={contextRef} />
+      <ContextMenu contextRef={contextRef} showContextMenu={showContextMenu} />
     </div>
   );
-}
+};
+
+export default Desktop;

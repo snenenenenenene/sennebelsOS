@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect } from "react";
 import Desktop from "./Desktop";
 import Taskbar from "./Taskbar";
 import Window from "./Window";
 import { startupSound } from "./utils/sounds";
 import { useWindowsStore } from "./utils/store";
+import { clickSound } from "./utils/sounds";
 
-// TODO: FIX MINIMISING AND REFRESH ERROR
 function App() {
   const alreadyVisited = useWindowsStore((state: any) => state?.alreadyVisited);
   const setAlreadyVisited = useWindowsStore(
@@ -13,15 +14,22 @@ function App() {
   );
   const windows = useWindowsStore((state: any) => state?.windows);
 
-  if (!alreadyVisited) {
-    startupSound.play();
-    setAlreadyVisited(true);
-  }
+  useEffect(() => {
+    if (!alreadyVisited) {
+      startupSound.play();
+      setAlreadyVisited(true);
+    }
+  }, [alreadyVisited, setAlreadyVisited]);
 
   return (
-    <div className="w-screen overflow-hidden h-screen flex font-display flex-col">
+    <div
+      onClick={() => {
+        clickSound.play();
+      }}
+      className="w-screen overflow-hidden h-screen flex font-display flex-col"
+    >
       <Desktop>
-        {windows &&
+        {Array.isArray(windows) &&
           windows.map((window: any) => (
             <Window id={window.id} key={window.id} />
           ))}

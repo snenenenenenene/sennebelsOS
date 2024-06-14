@@ -1,69 +1,95 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-unused-vars */
-// import { classes } from "@/data/classes/classes";
-// import { Class } from "@/data/classes/types";
-// import { races } from "@/data/races/races";
-// import { Race } from "@/data/races/types";
-import { nanoid } from "nanoid";
-import { create } from "zustand";
+import create from "zustand";
 import { devtools } from "zustand/middleware";
 
-export type TWindow = {
+interface Window {
   id: string;
   name: string;
   icon: string;
   type: string;
-  actionChildren: React.ReactNode;
   selected: boolean;
   minimised: boolean;
   maximised: boolean;
-  location: { left: number | string; top: number | string };
+  location: { left: number; top: number };
   size: { width: number; height: number };
-};
+  actionChildren: React.ReactNode;
+}
 
-export const useWindowsStore = create()(
-  devtools(
-    // persist(
-    (set) => ({
-      getWindow: (id: string) =>
-        set((state: any) => {
-          return state.windows.find((w: any) => w.id === id);
-        }),
-      setWindow: (window: any) =>
-        set((state: any) => {
-          const index = state.windows.findIndex((w: any) => w.id === window.id);
-          state.windows[index] = window;
-          return state;
-        }),
-      setWindows: (windows: any) => set({ windows }),
-      appendWindow: (window: any) =>
-        set((state: any) => ({
-          windows: [
-            ...state.windows,
-            {
-              ...window,
-              id: nanoid(),
-              location: {
-                left: window?.innerHeight / 2 - 250,
-                top: window?.innerWidth / 2 - 250,
-              },
-              minimised: false,
-              maximised: false,
-              // actionChildren: window?.actionChildren || null,
-            },
-          ],
+interface Store {
+  windows: Window[];
+  selectedEntries: string[];
+  alreadyVisited: boolean;
+  setAlreadyVisited: (visited: boolean) => void;
+  deselectAll: () => void;
+  setOnlySelected: (id: string) => void;
+  appendWindow: (
+    window: Partial<Window> & Pick<Window, "name" | "icon" | "type">
+  ) => void;
+  removeWindow: (id: string) => void;
+  toggleMinimiseWindow: (id: string) => void;
+  toggleMaximiseWindow: (id: string) => void;
+  updateWindowLocation: (
+    id: string,
+    location: { left: number; top: number }
+  ) => void;
+  updateWindowSize: (
+    id: string,
+    size: { width: number; height: number }
+  ) => void;
+}
+
+export const useWindowsStore = create<Store>(
+  devtools((set) => ({
+    windows: [],
+    selectedEntries: [],
+    alreadyVisited: false,
+    setAlreadyVisited: (visited: boolean) => set({ alreadyVisited: visited }),
+    deselectAll: () => set({ selectedEntries: [] }),
+    setOnlySelected: (id) =>
+      set((state) => ({
+        selectedEntries: [id],
+        windows: state.windows.map((window) => ({
+          ...window,
+          selected: window.id === id,
         })),
-      removeWindow: (window: any) =>
-        set((state: any) => ({
-          windows: state.windows.filter((w: any) => w.id !== window.id),
-        })),
-      windows: [],
-      alreadyVisited: false,
-      setAlreadyVisited: (alreadyVisited: boolean) => set({ alreadyVisited }),
-    })
-    // {
-    //   name: "OS-storage",
-    // }
-    // )
-  )
+      })),
+    appendWindow: (window) =>
+      set((state) => ({
+        windows: [
+          ...state.windows,
+          { ...window, id: `${Date.now()}`, selected: true },
+        ],
+      })),
+    removeWindow: (id) =>
+      set((state) => ({
+        windows: state.windows.filter((window) => window.id !== id),
+      })),
+    toggleMinimiseWindow: (id) =>
+      set((state) => ({
+        windows: state.windows.map((window) =>
+          window.id === id
+            ? { ...window, minimised: !window.minimised }
+            : window
+        ),
+      })),
+    toggleMaximiseWindow: (id) =>
+      set((state) => ({
+        windows: state.windows.map((window) =>
+          window.id === id
+            ? { ...window, maximised: !window.maximised }
+            : window
+        ),
+      })),
+    updateWindowLocation: (id, location) =>
+      set((state) => ({
+        windows: state.windows.map((window) =>
+          window.id === id ? { ...window, location } : window
+        ),
+      })),
+    updateWindowSize: (id, size) =>
+      set((state) => ({
+        windows: state.windows.map((window) =>
+          window.id === id ? { ...window, size } : window
+        ),
+      })),
+  }))
 );

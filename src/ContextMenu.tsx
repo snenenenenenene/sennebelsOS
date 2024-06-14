@@ -1,12 +1,14 @@
 import { RefObject } from "react";
 
-export default function ContextMenu({
-  contextRef,
-  showContextMenu,
-}: {
+interface ContextMenuProps {
   contextRef: RefObject<HTMLDivElement>;
   showContextMenu: boolean;
-}) {
+}
+
+const ContextMenu: React.FC<ContextMenuProps> = ({
+  contextRef,
+  showContextMenu,
+}) => {
   return (
     <div
       ref={contextRef}
@@ -25,4 +27,6 @@ export default function ContextMenu({
       </button>
     </div>
   );
-}
+};
+
+export default ContextMenu;

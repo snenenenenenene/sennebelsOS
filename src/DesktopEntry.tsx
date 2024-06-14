@@ -1,128 +1,79 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import { ReactNode, useState } from "react";
+import React from "react";
 import { useWindowsStore } from "./utils/store";
-export const DesktopEntry = ({
-  name,
-  icon,
-  type,
-  actionChildren,
-  itemSelected,
-  location,
-}: {
+
+interface DesktopEntryProps {
   name: string;
   icon: string;
   type: string;
-  itemSelected: boolean;
   location: {
     left: number;
     top: number;
   };
-  actionChildren?: ReactNode;
-}) => {
-  const [selected, setSelected] = useState(itemSelected);
-  const [dragging, setDragging] = useState(false);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const appendWindow = useWindowsStore((state: any) => state?.appendWindow);
+  actionChildren: React.ReactNode; // Ensure this is included in the props
+}
 
-  const handleMouseDown = (
-    event: MouseEvent & {
-      currentTarget: {
-        getBoundingClientRect: () => { left: number; top: number };
-        style: {
-          left: string;
-          top: string;
-        };
-      };
-    }
+const DesktopEntry: React.FC<DesktopEntryProps> = ({
+  name,
+  icon,
+  type,
+  location,
+  actionChildren,
+}) => {
+  const { selectedEntries, setOnlySelected, appendWindow } = useWindowsStore();
+  const isSelected = selectedEntries.includes(name);
+
+  const handleSelect = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
-    setDragging(true);
-    const rect = event.currentTarget.getBoundingClientRect();
-    setOffset({
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
+    event.stopPropagation(); // Prevent the click from bubbling to the desktop
+    setOnlySelected(name);
+  };
+
+  const handleDoubleClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    event.stopPropagation();
+    appendWindow({
+      name,
+      icon,
+      type,
+      selected: true,
+      minimised: false,
+      maximised: false,
+      location,
+      size: { width: 300, height: 200 },
+      actionChildren, // Pass the specific content for this desktop entry
     });
   };
 
-  const handleMouseMove = (
-    event: MouseEvent & {
-      currentTarget: {
-        style: {
-          left: string;
-          top: string;
-        };
-      };
-    }
-  ) => {
-    if (!dragging) return;
-
-    const newX = event?.clientX - offset.x;
-    const newY = event?.clientY - offset.y;
-
-    event.currentTarget!.style.left = newX + "px";
-    event.currentTarget!.style.top = newY + "px";
-  };
-
-  const handleMouseUp = () => {
-    setDragging(false);
-  };
-
   return (
-    <>
-      <article
-        onClick={() => {
-          if (selected) {
-            console.log("yaa");
-            appendWindow({
-              id: name,
-              name,
-              icon,
-              type,
-              actionChildren,
-              selected,
-              minimised: false,
-              maximised: false,
-              location: { top: location.top, left: location.left },
-              size: { width: 0, height: 0 },
-            });
-          }
-          setSelected(true);
-        }}
-        // @ts-ignore
-        onMouseDown={handleMouseDown}
-        // @ts-ignore
-        onMouseMove={handleMouseMove}
-        onMouseLeave={() => {
-          if (!dragging) {
-            setDragging(false);
-          }
-        }}
-        onMouseUp={handleMouseUp}
-        draggable={false}
-        className="select-text max-w-10 overflow-hidden transform absolute group flex-col justify-center text-center w-24 h-fit text-light-primary"
-        style={{
-          left: location.left || 0,
-          top: location.top || 0,
-        }}
+    <article
+      onClick={handleSelect}
+      onDoubleClick={handleDoubleClick}
+      className="select-text max-w-10 overflow-hidden transform absolute flex-col justify-center text-center w-24 h-fit"
+      style={{
+        left: `${location.left}px`,
+        top: `${location.top}px`,
+      }}
+    >
+      <div className="w-16 h-16 flex justify-center items-center mx-auto">
+        <img
+          src={icon}
+          alt={icon}
+          className="object-cover select-none w-full h-full"
+        />
+      </div>
+      <p
+        className={`whitespace-pre-wrap select-none border-2 mt-1 ${
+          isSelected
+            ? "bg-blue-500 text-white border-gray-300"
+            : "border-transparent"
+        } group-hover:border-gray-300`}
       >
-        <div className="w-16 h-16 flex justify-center items-center mx-auto">
-          {icon && (
-            <img
-              src={icon}
-              className="object-cover select-none w-full h-full"
-              alt={icon}
-              draggable={false}
-            />
-          )}
-        </div>
-        <p
-          className={`${
-            selected ? "bg-light-blue border-light-gray" : ""
-          } border-dotted whitespace-pre-wrap select-none border-2 border-transparent  group-hover:border-light-gray mt-1`}
-        >
-          {name || "No Name"}
-        </p>
-      </article>
-    </>
+        {name || "No Name"}
+      </p>
+    </article>
   );
 };
+
+export default DesktopEntry;
